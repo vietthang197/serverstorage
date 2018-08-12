@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload file</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+   <div class="row">
+       <h2 style="text-align: center;">Server Upload File to Google Drive</h2>
+       <hr>
+   </div>
+
+    <div class="row">
+        <div class="col-sm-8">
+            <!-- File Upload From -->
+            <form action="/" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Select File</label>
+                    <input id="ipFile" class="form-control" type="file" name="file" required>
+                </div>
+                <div class="form-group">
+                    <button id="btnSubmit" class="btn btn-primary" onclick="submits()" type="submit">Upload</button>
+                </div>
+            </form>
+            <br />
+            <!-- Bootstrap Progress bar -->
+            <div class="progress">
+                <div id="progressBar"  class="progress-bar progress-bar-striped active" role="progressbar"
+                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0%</div>
+            </div>
+
+        </div>
+        <div class="col-sm-4">
+            <h3>Lưu ý</h3>
+            <ul>
+                <li>Server chỉ upload cùng 1 lúc là 1 file</li>
+                <li>Dung lượng file tối đa là 10GB</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+
+    $('form').submit(function(){
+        $('#btnSubmit').text('Uploading ....');
+        $('#progressBar').css("visibility", " visible");
+        $(this).find('button[type=submit]').prop('disabled', true);
+    });
+
+    function crunchifyAjax() {
+        $.ajax({
+            url : 'getPercentUploadFile',
+            success : function(data) {
+                $('#progressBar').attr('aria-valuenow', data + '%').css('width',data + '%');
+                $('#progressBar').html(data + '%');
+            }
+        });
+    }
+    function submits() {
+        var intervalId = 0;
+        intervalId = setInterval(crunchifyAjax, 500);
+    }
+</script>
+</html>
