@@ -23,7 +23,7 @@
     <div class="row">
         <div class="col-sm-8">
             <!-- File Upload From -->
-            <form action="/" method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Select File</label>
                     <input id="ipFile" class="form-control" type="file" name="file" required>
@@ -57,12 +57,13 @@
     $('form').submit(function(){
         $('#btnSubmit').text('Uploading ....');
         $('#progressBar').css("visibility", " visible");
+        $('#ipFile').prop('disabled', true);
         $(this).find('button[type=submit]').prop('disabled', true);
     });
 
     function crunchifyAjax() {
         $.ajax({
-            url : 'getPercentUploadFile',
+            url : 'upload/getPercentUploadFile',
             success : function(data) {
                 $('#progressBar').attr('aria-valuenow', data + '%').css('width',data + '%');
                 $('#progressBar').html(data + '%');

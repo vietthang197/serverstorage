@@ -19,6 +19,8 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,13 +39,15 @@ import java.util.logging.FileHandler;
 
 public class GoogleDriveService {
 
+    public static Logger logger = LoggerFactory.getLogger(GoogleDriveService.class);
+
     private static final String APPLICATION_NAME = "Google Drive API Java Quickstart";
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     // Directory to store user credentials for this application.
     private static final java.io.File CREDENTIALS_FOLDER //
-            = new java.io.File(System.getProperty("user.home"), "credentials");
+            = new java.io.File("asus", "credentials");
 
     private static final String CLIENT_SECRET_FILE_NAME =
             "client_secret_1004552806313-pecc9adfeomorgltujgcearm9c5rrjq0.apps.googleusercontent.com.json";
@@ -56,11 +60,6 @@ public class GoogleDriveService {
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
 
         java.io.File clientSecretFilePath = new java.io.File(CREDENTIALS_FOLDER, CLIENT_SECRET_FILE_NAME);
-
-        if (!clientSecretFilePath.exists()) {
-            throw new FileNotFoundException("Please copy " + CLIENT_SECRET_FILE_NAME //
-                    + " to folder: " + CREDENTIALS_FOLDER.getAbsolutePath());
-        }
 
         // Load client secrets.
         InputStream in = new FileInputStream(clientSecretFilePath);
@@ -78,14 +77,15 @@ public class GoogleDriveService {
     public static Drive  getDriveService() throws IOException, GeneralSecurityException {
 
         System.out.println("CREDENTIALS_FOLDER: " + CREDENTIALS_FOLDER.getAbsolutePath());
+        logger.debug("This is mother fucker");
 
         // 1: Create CREDENTIALS_FOLDER
         if (!CREDENTIALS_FOLDER.exists()) {
             CREDENTIALS_FOLDER.mkdirs();
             java.io.File file = new ClassPathResource(CLIENT_SECRET_FILE_NAME).getFile();
             FileUtils.copyFileToDirectory(file, CREDENTIALS_FOLDER);
-             System.out.println("Created Folder: " + CREDENTIALS_FOLDER.getAbsolutePath());
-             System.out.println("Copy file " + CLIENT_SECRET_FILE_NAME + " into folder above.. and rerun this class!!");
+            logger.debug("Created Folder: " + CREDENTIALS_FOLDER.getAbsolutePath());
+            logger.debug("Copy file " + CLIENT_SECRET_FILE_NAME + " into folder above.. and rerun this class!!");
         }
 
         // 2: Build a new authorized API client service.
@@ -112,7 +112,7 @@ public class GoogleDriveService {
         File file = driveService.files().create(fileMetadata)
                 .setFields("id")
                 .execute();
-        System.out.println("Folder ID: " + file.getId());
+        logger.debug("Folder ID: " + file.getId());
     }
 
     public static Drive.Files.Create createGoogleFileFromInputStream(String googleFolderIdParent, String contentType, String customFileName, InputStream inputStream) throws IOException, GeneralSecurityException {
@@ -132,5 +132,17 @@ public class GoogleDriveService {
         Drive.Files.Create createFile  = driveService.files().create(fileMetadata, uploadStreamContent)
                 .setFields("id, webContentLink, webViewLink, parents");
         return createFile;
+    }
+
+    public static String getFileNameFromId(String id) {
+        String fileName = null;
+        try {
+            fileName = getDriveService().files().get(id).execute().getName();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        return fileName;
     }
 }

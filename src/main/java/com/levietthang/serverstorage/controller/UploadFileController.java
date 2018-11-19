@@ -25,14 +25,14 @@ import java.security.GeneralSecurityException;
 
 @Controller
 @EntityScan(basePackages = {"com.levietthang.serverstorage", "com.levietthang.serverstorage.controller"})
-@RequestMapping("/")
+@RequestMapping("/upload")
 public class UploadFileController implements MediaHttpUploaderProgressListener {
-    long firstSize = 0;
-    float result =0f;
+    private long firstSize = 0;
+    private float result =0f;
 
     @GetMapping
     public String defaults() {
-        result = 0;
+        result = 0f;
         long firstSize = 0;
         return "upload";
     }
@@ -48,7 +48,7 @@ public class UploadFileController implements MediaHttpUploaderProgressListener {
         File  filed = null;
         try {
             filed = createFile.execute();
-            return new ResponseEntity<>(filed.getWebViewLink(),HttpStatus.OK);
+            return new ResponseEntity<>(filed.getId(),HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,6 +73,7 @@ public class UploadFileController implements MediaHttpUploaderProgressListener {
                 break;
             case MEDIA_IN_PROGRESS:
                  result = ((float)(mediaHttpUploader.getNumBytesUploaded() / 1024)/(float) firstSize) * 100;
+                System.out.println(result);
                 break;
             case MEDIA_COMPLETE:
                 System.out.println("Upload is complete!");
