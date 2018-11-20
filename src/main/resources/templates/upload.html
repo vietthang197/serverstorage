@@ -23,14 +23,11 @@
     <div class="row">
         <div class="col-sm-8">
             <!-- File Upload From -->
-            <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Select File</label>
-                    <input id="ipFile" class="form-control" type="file" name="file" required>
-                </div>
-                <div class="form-group">
-                    <button id="btnSubmit" class="btn btn-primary" onclick="submits()" type="submit">Upload</button>
-                </div>
+            <form method="POST" enctype="multipart/form-data" action="/upload/">
+                <table>
+                    <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+                    <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+                </table>
             </form>
             <br />
             <!-- Bootstrap Progress bar -->
@@ -57,7 +54,7 @@
     $('form').submit(function(){
         $('#btnSubmit').text('Uploading ....');
         $('#progressBar').css("visibility", " visible");
-        $('#ipFile').prop('disabled', true);
+        $('#file').prop('disabled', true);
         $(this).find('button[type=submit]').prop('disabled', true);
     });
 

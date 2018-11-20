@@ -37,9 +37,9 @@ public class UploadFileController implements MediaHttpUploaderProgressListener {
         return "upload";
     }
 
-    @PostMapping
+    @PostMapping("/")
     @ResponseBody
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException, GeneralSecurityException {
+    public ResponseEntity<String> uploadFile(@RequestParam(name = "file", required = true) MultipartFile file) throws IOException, GeneralSecurityException {
         Drive.Files.Create createFile = GoogleDriveService.createGoogleFileFromInputStream(null, file.getContentType(), file.getOriginalFilename(), file.getInputStream());
             firstSize = file.getSize() / 1024;
             MediaHttpUploader uploader = createFile.getMediaHttpUploader();
@@ -48,11 +48,11 @@ public class UploadFileController implements MediaHttpUploaderProgressListener {
         File  filed = null;
         try {
             filed = createFile.execute();
-            return new ResponseEntity<>(filed.getId(),HttpStatus.OK);
+            return new ResponseEntity<>("https://serverfile.herokuapp.com/download/fileId/" + filed.getId(),HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return  new ResponseEntity<>("Failed",HttpStatus.BAD_REQUEST);
+         return  new ResponseEntity<>("Failed",HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/getPercentUploadFile")
